@@ -1,0 +1,24 @@
+name: publish-docker
+on: push
+
+jobs:
+  publish-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Load secret
+        uses: 1password/load-secrets-action@v2
+        with:
+          # Export loaded secrets as environment variables
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          KUBE_CONFIG: op://OpenServerless/aks_kubeconfig
+
+      - name: Get nodes
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: $KUBE_CONFIG
+        with:
+          args: get nodes
