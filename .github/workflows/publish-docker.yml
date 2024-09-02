@@ -1,12 +1,10 @@
-name: publish-docker
+name: kubectl-demo
 on: push
 
 jobs:
-  publish-docker:
+  kubectl-demo:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
       - name: Load secret
         uses: 1password/load-secrets-action@v2
         with:
@@ -14,11 +12,10 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          KUBE_CONFIG: op://OpenServerless/aks_kubeconfig
+          AKS_KUBE_CONFIG: op://OpenServerless/aks_kubeconfig/text
 
       - name: Get nodes
-        uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: $KUBE_CONFIG
-        with:
-          args: get nodes
+        uses: steebchen/kubectl@v2.0.0
+        with: # defaults to latest kubectl binary version
+          config: "${{ env.AKS_KUBE_CONFIG }}"
+          command: get nodes
